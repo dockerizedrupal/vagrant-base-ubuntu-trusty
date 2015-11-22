@@ -1,4 +1,4 @@
-VERSION = "0.3.0"
+VERSION = "0.4.0"
 
 require 'yaml'
 
@@ -15,7 +15,7 @@ VAGRANT_COMMAND = ARGV[0]
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/trusty64"
 
-  config.vm.hostname = "dockerizedrupal"
+  config.vm.hostname = vm_config["server_name"]
 
   config.ssh.insert_key = false
 
@@ -23,13 +23,12 @@ Vagrant.configure("2") do |config|
     config.ssh.username = "container"
   end
 
-  config.vm.network :forwarded_port, guest: 80, host: 80
-  config.vm.network :forwarded_port, guest: 443, host: 443
+  config.vm.network "private_network", ip: vm_config["ip_address"]
 
   config.vm.synced_folder ".", "/vagrant", disabled: true
   config.vm.synced_folder ".", "/var/www"
 
-  config.vm.synced_folder File.expand_path('system32/drivers/', ENV['windir']), "/winhost"
+  config.vm.synced_folder File.expand_path("system32/drivers/", ENV["windir"]), "/winhost"
 
   config.vm.provider "virtualbox" do |v|
     name = "dockerizedrupal-base-ubuntu-trusty-" + VERSION
@@ -37,8 +36,8 @@ Vagrant.configure("2") do |config|
     name.gsub!(".", "-")
 
     v.name = name
-    v.cpus = vm_config['cpus']
-    v.memory = vm_config['memory_size']
+    v.cpus = vm_config["cpus"]
+    v.memory = vm_config["memory_size"]
   end
 
   config.vm.provision "shell", inline: "initctl emit vagrant-ready", run: "always"
@@ -47,6 +46,7 @@ Vagrant.configure("2") do |config|
     s.inline = <<-SHELL
       MEMORY_SIZE="${1}"
       SERVER_NAME="${2}"
+      IP_ADDRESS="${3}"
 
       swap_create() {
         local memory_size="${1}"
@@ -139,6 +139,7 @@ Vagrant.configure("2") do |config|
         cp ./docker-compose.yml /opt/vhost.yml
 
         sed -i "s/SERVER_NAME=localhost/SERVER_NAME=${server_name}/" /opt/vhost.yml
+        sed -i "s/HOSTS_IP_ADDRESS=127.0.0.1/HOSTS_IP_ADDRESS=${IP_ADDRESS}/" /opt/vhost.yml
         sed -i "s|/etc/hosts|/winhost/etc/hosts|" /opt/vhost.yml
 
         docker-compose -f /opt/vhost.yml up -d
@@ -154,8 +155,9 @@ Vagrant.configure("2") do |config|
     SHELL
 
     s.args = [
-      vm_config['memory_size'],
-      vm_config['server_name'],
+      vm_config["memory_size"],
+      vm_config["server_name"],
+      vm_config["ip_address"],
     ]
   end
 end
