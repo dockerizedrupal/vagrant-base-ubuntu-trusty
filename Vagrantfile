@@ -1,4 +1,4 @@
-VERSION = "0.4.0"
+VERSION = "0.4.1"
 
 require 'yaml'
 
@@ -145,6 +145,26 @@ Vagrant.configure("2") do |config|
         docker-compose -f /opt/vhost.yml up -d
       }
 
+      nodejs_install() {
+        curl -sL https://deb.nodesource.com/setup_4.x | bash -
+
+        apt-get install -y nodejs
+      }
+
+      grunt_install() {
+        npm install -g grunt-cli
+      }
+
+      bats_install() {
+        local tmp="$(mktemp -d)"
+
+        git clone https://github.com/sstephenson/bats.git "${tmp}"
+
+        cd "${tmp}"
+
+        ./install.sh /usr/local
+      }
+
       swap_create "${MEMORY_SIZE}"
       user_create
       docker_engine_install
@@ -152,6 +172,9 @@ Vagrant.configure("2") do |config|
       drupal_compose_install
       crush_install
       vhost_install "${SERVER_NAME}"
+      nodejs_install
+      grunt_install
+      bats_install
     SHELL
 
     s.args = [
