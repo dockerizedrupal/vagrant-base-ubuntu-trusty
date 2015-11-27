@@ -1,6 +1,6 @@
 {
   "name": "vagrant-base-ubuntu-trusty",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/dockerizedrupal/vagrant-base-ubuntu-trusty.git"

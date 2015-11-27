@@ -1,4 +1,4 @@
-VERSION = "0.4.2"
+VERSION = "0.4.3"
 
 require 'yaml'
 
@@ -9,8 +9,6 @@ required_plugins.each do |plugin|
 end
 
 vm_config = YAML.load_file("config.yml")
-
-VAGRANT_COMMAND = ARGV[0]
 
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/trusty64"
