@@ -1,4 +1,4 @@
-VERSION = "0.4.1"
+VERSION = "0.4.2"
 
 require 'yaml'
 
@@ -16,12 +16,6 @@ Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/trusty64"
 
   config.vm.hostname = vm_config["server_name"]
-
-  config.ssh.insert_key = false
-
-  if VAGRANT_COMMAND == "ssh"
-    config.ssh.username = "container"
-  end
 
   config.vm.network "private_network", ip: vm_config["ip_address"]
 
@@ -70,24 +64,12 @@ Vagrant.configure("2") do |config|
         echo "vm.vfs_cache_pressure=50" >> /etc/sysctl.conf
       }
 
-      user_create() {
-        adduser --disabled-password --gecos "" container
-
-        cp -ar /home/vagrant/.ssh /home/container
-
-        chown -R container.container /home/container/.ssh
-
-        echo "container:container" | chpasswd
-
-        echo "container ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/container
-      }
-
       docker_engine_install() {
         wget -qO- https://get.docker.com/ | sh
 
         sed -i "s/^start on (local-filesystems and net-device-up IFACE!=lo)/start on vagrant-ready/" /etc/init/docker.conf
 
-        usermod -aG docker container
+        usermod -aG docker vagrant
       }
 
       docker_compose_install() {
@@ -165,8 +147,11 @@ Vagrant.configure("2") do |config|
         ./install.sh /usr/local
       }
 
+      mysql_client_install() {
+        apt-get install -y mysql-client
+      }
+
       swap_create "${MEMORY_SIZE}"
-      user_create
       docker_engine_install
       docker_compose_install
       drupal_compose_install
@@ -175,6 +160,7 @@ Vagrant.configure("2") do |config|
       nodejs_install
       grunt_install
       bats_install
+      mysql_client_install
     SHELL
 
     s.args = [
