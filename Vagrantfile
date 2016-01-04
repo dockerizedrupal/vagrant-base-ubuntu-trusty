@@ -1,4 +1,4 @@
-VERSION = "0.4.4"
+VERSION = "0.4.5"
 
 require 'yaml'
 
@@ -71,7 +71,7 @@ Vagrant.configure("2") do |config|
       }
 
       docker_compose_install() {
-        curl -L https://github.com/docker/compose/releases/download/1.5.1/docker-compose-Linux-x86_64 > /usr/local/bin/docker-compose
+        curl -L https://github.com/docker/compose/releases/download/1.5.2/docker-compose-Linux-x86_64 > /usr/local/bin/docker-compose
 
         chmod +x /usr/local/bin/docker-compose
       }
@@ -83,7 +83,7 @@ Vagrant.configure("2") do |config|
 
         cd "${tmp}"
 
-        git checkout 1.2.0
+        git checkout 1.2.1
 
         cp "${tmp}/drupal-compose.sh" /usr/local/bin/drupal-compose
 
@@ -97,7 +97,7 @@ Vagrant.configure("2") do |config|
 
         cd "${tmp}"
 
-        git checkout 1.1.2
+        git checkout 1.1.3
 
         cp "${tmp}/crush.sh" /usr/local/bin/crush
 
