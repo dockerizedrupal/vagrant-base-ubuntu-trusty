@@ -1,4 +1,4 @@
-VERSION = "0.4.5"
+VERSION = "0.4.6"
 
 require 'yaml'
 
@@ -83,7 +83,7 @@ Vagrant.configure("2") do |config|
 
         cd "${tmp}"
 
-        git checkout 1.2.1
+        git checkout 1.2.6
 
         cp "${tmp}/drupal-compose.sh" /usr/local/bin/drupal-compose
 
@@ -97,7 +97,7 @@ Vagrant.configure("2") do |config|
 
         cd "${tmp}"
 
-        git checkout 1.1.3
+        git checkout 1.1.4
 
         cp "${tmp}/crush.sh" /usr/local/bin/crush
 
