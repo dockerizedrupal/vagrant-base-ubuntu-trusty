@@ -1,4 +1,4 @@
-VERSION = "0.4.6"
+VERSION = "0.4.7"
 
 require 'yaml'
 
@@ -62,48 +62,14 @@ Vagrant.configure("2") do |config|
         echo "vm.vfs_cache_pressure=50" >> /etc/sysctl.conf
       }
 
-      docker_engine_install() {
-        wget -qO- https://get.docker.com/ | sh
+      updater_install() {
+        curl -L https://raw.githubusercontent.com/dockerizedrupal/updater/master/updater.sh > /usr/local/bin/updater
 
-        sed -i "s/^start on (local-filesystems and net-device-up IFACE!=lo)/start on vagrant-ready/" /etc/init/docker.conf
+        chmod +x /usr/local/bin/updater
+
+        updater
 
         usermod -aG docker vagrant
-      }
-
-      docker_compose_install() {
-        curl -L https://github.com/docker/compose/releases/download/1.5.2/docker-compose-Linux-x86_64 > /usr/local/bin/docker-compose
-
-        chmod +x /usr/local/bin/docker-compose
-      }
-
-      drupal_compose_install() {
-        local tmp="$(mktemp -d)"
-
-        git clone https://github.com/dockerizedrupal/drupal-compose.git "${tmp}"
-
-        cd "${tmp}"
-
-        git checkout 1.2.6
-
-        cp "${tmp}/drupal-compose.sh" /usr/local/bin/drupal-compose
-
-        chmod +x /usr/local/bin/drupal-compose
-      }
-
-      crush_install() {
-        local tmp="$(mktemp -d)"
-
-        git clone https://github.com/dockerizedrupal/crush.git "${tmp}"
-
-        cd "${tmp}"
-
-        git checkout 1.1.4
-
-        cp "${tmp}/crush.sh" /usr/local/bin/crush
-
-        chmod +x /usr/local/bin/crush
-
-        ln -s /usr/local/bin/crush /usr/local/bin/drush
       }
 
       vhost_install() {
@@ -150,10 +116,7 @@ Vagrant.configure("2") do |config|
       }
 
       swap_create "${MEMORY_SIZE}"
-      docker_engine_install
-      docker_compose_install
-      drupal_compose_install
-      crush_install
+      updater_install
       vhost_install "${SERVER_NAME}"
       nodejs_install
       grunt_install
