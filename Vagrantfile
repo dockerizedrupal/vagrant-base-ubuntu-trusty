@@ -1,4 +1,4 @@
-VERSION = "0.4.7"
+VERSION = "0.4.8"
 
 require 'yaml'
 
@@ -69,6 +69,8 @@ Vagrant.configure("2") do |config|
 
         updater
 
+        sed -i "s/^start on (filesystem and net-device-up IFACE!=lo)/start on vagrant-ready/" /etc/init/docker.conf
+
         usermod -aG docker vagrant
       }
 
@@ -80,7 +82,7 @@ Vagrant.configure("2") do |config|
 
         cd "${tmp}"
 
-        git checkout 1.1.7
+        git checkout 1.1.8
 
         cp ./docker-compose.yml /opt/vhost.yml
 
